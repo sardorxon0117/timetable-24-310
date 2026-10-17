@@ -142,7 +142,7 @@
       transform: scale(0.92);
     }
 
-    /* Glass container */
+    /* Schedule table */
     .schedule-shell {
       flex: 1;
       padding: 6px;
@@ -205,12 +205,11 @@
 
     td {
       height: calc((100vh - 160px) / 7);
-      min-height: 70px;
+      min-height: 85px;
       padding: 4px;
       border-radius: 6px;
     }
 
-    /* Time column */
     .time-cell {
       height: auto;
       vertical-align: middle;
@@ -231,7 +230,7 @@
       white-space: nowrap;
     }
 
-    /* Subject cards */
+    /* Cards */
     .lesson {
       height: 100%;
       padding: 6px 8px;
@@ -259,7 +258,7 @@
 
     .lesson-time {
       color: var(--accent);
-      font-size: 8.5px;
+      font-size: 8px;
       font-weight: 800;
       margin-bottom: 2px;
       white-space: nowrap;
@@ -278,11 +277,11 @@
       font-size: 9px;
     }
 
-    .teacher, .room {
+    .teacher, .room, .groups {
       color: var(--muted);
       font-size: 8.5px;
       line-height: 1.2;
-      margin-top: 2px;
+      margin-top: 1px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -293,7 +292,6 @@
       color: var(--text);
     }
 
-    /* Empty days */
     .empty {
       height: 100%;
       display: flex;
@@ -309,7 +307,6 @@
       background: var(--empty-bg);
     }
 
-    /* Footer */
     .footer {
       display: flex;
       align-items: center;
@@ -339,7 +336,7 @@
       background: var(--dot);
     }
 
-    /* MODAL MAP STYLES */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -585,7 +582,7 @@
   </div>
 
   <script>
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzSpGkWZwVgu20b9FH9QtEh4bD18XTENDW-l7-mkIGgA3PNMZ41nyXqh-nAnd_9N8NR/exec";
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxAEveFB33E5_3gV80MJRH6s62ilw847vbH-vE1xIuaD-EGGD0eeAWBBEh9OxJcvCJe/exec";
 
     const periods = [
       { name: "1-para", time: "08:00 – 09:20" },
@@ -597,28 +594,20 @@
       { name: "7-para", time: "18:00 – 19:20" }
     ];
 
-    let scheduleData = {
-      // Zaxira (fallback) ma'lumotlar
-      "5-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "238-xona", groups: "24-310 (EN)", color: "green" },
-      "6-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "234-xona", groups: "24-310 (EN)", color: "green" },
-      "1-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
-      "2-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
-      "3-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
-      "4-5": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", groups: "24-310 (EN)", color: "orange" },
-      "5-5": { subject: "Risk Analysis and Systems Testing", type: "", teacher: "", room: "236-xona", groups: "24-310 (EN)", color: "orange" },
-      "1-6": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "purple" },
-      "2-6": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", groups: "24-310 (EN)", color: "purple" },
-      "3-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "323-xona", groups: "24-310 (EN)", color: "purple" },
-      "4-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "238-xona", groups: "24-310 (EN)", color: "purple" },
-      "5-6": { subject: "Digital Sustainability", type: "", teacher: "G‘ulomov Abdulaziz", room: "236-xona", groups: "24-310 (EN)", color: "purple" }
-    };
+    let scheduleData = {};
 
     const roomLocations = {
+      "133": { floor: 1, top: 58, left: 81.5, name: "133-xona (Auditoriya)" },
       "133-xona": { floor: 1, top: 58, left: 81.5, name: "133-xona (Auditoriya)" },
+      "227": { floor: 2, top: 22, left: 56.5, name: "227-xona (Amaliyot)" },
       "227-xona": { floor: 2, top: 22, left: 56.5, name: "227-xona (Amaliyot)" },
+      "234": { floor: 2, top: 43, left: 82.5, name: "234-xona (IoT Amaliyot)" },
       "234-xona": { floor: 2, top: 43, left: 82.5, name: "234-xona (IoT Amaliyot)" },
+      "236": { floor: 2, top: 43, left: 88.5, name: "236-xona" },
       "236-xona": { floor: 2, top: 43, left: 88.5, name: "236-xona" },
+      "238": { floor: 2, top: 43, left: 94.0, name: "238-xona" },
       "238-xona": { floor: 2, top: 43, left: 94.0, name: "238-xona" },
+      "323": { floor: 3, top: 82, left: 59.2, name: "323-xona (Falsafa)" },
       "323-xona": { floor: 3, top: 82, left: 59.2, name: "323-xona (Falsafa)" }
     };
 
@@ -650,8 +639,8 @@
                   ${lesson.type ? `<span class="lesson-type">(${lesson.type})</span>` : ""}
                 </div>
                 ${lesson.teacher ? `<div class="teacher">👤 ${lesson.teacher}</div>` : ""}
-                <div class="room">📍 ${lesson.room}</div>
-                ${lesson.groups ? `<div class="teacher" style="font-size:7.5px; opacity:0.8;">👥 ${lesson.groups}</div>` : ""}
+                ${lesson.room ? `<div class="room">📍 ${lesson.room}</div>` : ""}
+                ${lesson.groups ? `<div class="groups">👥 ${lesson.groups}</div>` : ""}
               </div>
             `;
           } else {
@@ -670,10 +659,10 @@
 
         if (!rows || rows.length === 0) return;
 
-        // "24-310" guruhining qatorini topamiz
+        // 24-310 (EN) guruhini qatordan topish
         let myGroupRow = null;
         for (let i = 0; i < rows.length; i++) {
-          if (rows[i][0] && rows[i][0].includes("24-310")) {
+          if (rows[i][0] && rows[i][0].toString().includes("24-310")) {
             myGroupRow = rows[i];
             break;
           }
@@ -688,45 +677,34 @@
           for (let period = 0; period < 7; period++) {
             const cellText = myGroupRow[colIndex];
             if (cellText && cellText.trim() !== "") {
-              // Qatorlarni bo'lib olamiz
               const lines = cellText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
               
               let subject = lines[0] || "Dars";
               let teacher = "";
-              let roomRaw = "";
+              let room = "";
               let groups = "";
 
-              // Katak tarkibini tahlil qilish
-              lines.forEach((line, idx) => {
-                if (idx === 0) {
-                  subject = line;
-                } else if (line.toLowerCase().includes("room") || line.toLowerCase().includes("lecture") || /\d{3}/.test(line)) {
-                  roomRaw = line;
+              // Qatorlarni to'g'ri taqsimlash
+              for (let j = 1; j < lines.length; j++) {
+                const line = lines[j];
+                const lower = line.toLowerCase();
+                if (lower.includes("room") || lower.includes("auditoriya") || /^\d{3}/.test(line)) {
+                  const match = line.match(/\d+/);
+                  room = match ? `${match[0]}-xona` : line;
                 } else if (line.includes("24-") || line.includes("EN") || line.includes("Group")) {
                   groups = line;
                 } else {
-                  if (!teacher) teacher = line;
-                  else teacher += " " + line;
+                  teacher = teacher ? teacher + ", " + line : line;
                 }
-              });
-
-              // Xona raqamini ajratish (Masalan: "238 Lecture Room" -> "238-xona")
-              let room = roomRaw;
-              const match = roomRaw.match(/\d+/);
-              if (match) {
-                room = `${match[0]}-xona`;
-              } else if (!roomRaw) {
-                room = "Xona ko'rsatilmadi";
               }
 
-              // Dars turini (Lecture/Practice) ajratish
               let type = "";
-              if (subject.includes("(Practice)")) {
+              if (subject.includes("(Practice)") || subject.includes("Amaliyot")) {
                 type = "Amaliyot";
-                subject = subject.replace("(Practice)", "").trim();
-              } else if (subject.includes("(Lecture)")) {
-                type = "Ma’ruza";
-                subject = subject.replace("(Lecture)", "").trim();
+                subject = subject.replace(/\(Practice\)/gi, "").trim();
+              } else if (subject.includes("(Lecture)") || subject.includes("Ma'ruza")) {
+                type = "Ma'ruza";
+                subject = subject.replace(/\(Lecture\)/gi, "").trim();
               }
 
               scheduleData[`${period}-${day}`] = {
@@ -755,7 +733,8 @@
     let selectedRoomKey = null;
 
     function openMap(roomName, subjectName) {
-      const roomInfo = roomLocations[roomName] || { floor: 2, top: 50, left: 50, name: roomName };
+      const cleanRoom = roomName.replace("-xona", "").trim();
+      const roomInfo = roomLocations[roomName] || roomLocations[cleanRoom] || { floor: 2, top: 50, left: 50, name: roomName };
       selectedRoomKey = roomName;
       currentFloor = roomInfo.floor;
 
@@ -790,7 +769,9 @@
         img.src = "3-qavat.jpg";
       }
 
-      const activeRoom = targetRoom || roomLocations[selectedRoomKey];
+      const cleanRoom = selectedRoomKey ? selectedRoomKey.replace("-xona", "").trim() : "";
+      const activeRoom = targetRoom || roomLocations[selectedRoomKey] || roomLocations[cleanRoom];
+      
       if (activeRoom && activeRoom.floor === floorNum) {
         pin.style.top = `${activeRoom.top}%`;
         pin.style.left = `${activeRoom.left}%`;
