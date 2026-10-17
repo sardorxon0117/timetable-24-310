@@ -582,8 +582,6 @@
   </div>
 
   <script>
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzSpGkWZwVgu20b9FH9QtEh4bD18XTENDW-l7-mkIGgA3PNMZ41nyXqh-nAnd_9N8NR/exec";
-
     const periods = [
       { name: "1-para", time: "08:00 – 09:20" },
       { name: "2-para", time: "09:30 – 10:50" },
@@ -594,7 +592,26 @@
       { name: "7-para", time: "18:00 – 19:20" }
     ];
 
-    let scheduleData = {};
+    // Aniq va to'g'ri dars jadvali ma'lumotlari
+    const scheduleData = {
+      // Payshanba (dayIndex: 3)
+      "5-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "238-xona", groups: "24-310 (EN)", color: "green" },
+      "6-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "234-xona", groups: "24-310 (EN)", color: "green" },
+
+      // Shanba (dayIndex: 5)
+      "1-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
+      "2-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
+      "3-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
+      "4-5": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", groups: "24-310 (EN)", color: "orange" },
+      "5-5": { subject: "Risk Analysis and Systems Testing", type: "", teacher: "", room: "236-xona", groups: "24-310 (EN)", color: "orange" },
+
+      // Yakshanba (dayIndex: 6)
+      "1-6": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "purple" },
+      "2-6": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", groups: "24-310 (EN)", color: "purple" },
+      "3-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "323-xona", groups: "24-310 (EN)", color: "purple" },
+      "4-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "238-xona", groups: "24-310 (EN)", color: "purple" },
+      "5-6": { subject: "Digital Sustainability", type: "", teacher: "G‘ulomov Abdulaziz", room: "236-xona", groups: "24-310 (EN)", color: "purple" }
+    };
 
     const roomLocations = {
       "133": { floor: 1, top: 58, left: 81.5, name: "133-xona (Auditoriya)" },
@@ -652,82 +669,7 @@
       });
     }
 
-    async function fetchSheetData() {
-      try {
-        const response = await fetch(SHEET_API_URL);
-        const rows = await response.json();
-
-        if (!rows || rows.length === 0) return;
-
-        // 24-310 (EN) guruhini qatordan topish
-        let myGroupRow = null;
-        for (let i = 0; i < rows.length; i++) {
-          if (rows[i][0] && rows[i][0].toString().includes("24-310")) {
-            myGroupRow = rows[i];
-            break;
-          }
-        }
-
-        if (!myGroupRow) return;
-
-        const dayColors = ["green", "green", "green", "green", "green", "orange", "purple"];
-        let colIndex = 1;
-
-        for (let day = 0; day < 7; day++) {
-          for (let period = 0; period < 7; period++) {
-            const cellText = myGroupRow[colIndex];
-            if (cellText && cellText.trim() !== "") {
-              const lines = cellText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-              
-              let subject = lines[0] || "Dars";
-              let teacher = "";
-              let room = "";
-              let groups = "";
-
-              // Qatorlarni to'g'ri taqsimlash
-              for (let j = 1; j < lines.length; j++) {
-                const line = lines[j];
-                const lower = line.toLowerCase();
-                if (lower.includes("room") || lower.includes("auditoriya") || /^\d{3}/.test(line)) {
-                  const match = line.match(/\d+/);
-                  room = match ? `${match[0]}-xona` : line;
-                } else if (line.includes("24-") || line.includes("EN") || line.includes("Group")) {
-                  groups = line;
-                } else {
-                  teacher = teacher ? teacher + ", " + line : line;
-                }
-              }
-
-              let type = "";
-              if (subject.includes("(Practice)") || subject.includes("Amaliyot")) {
-                type = "Amaliyot";
-                subject = subject.replace(/\(Practice\)/gi, "").trim();
-              } else if (subject.includes("(Lecture)") || subject.includes("Ma'ruza")) {
-                type = "Ma'ruza";
-                subject = subject.replace(/\(Lecture\)/gi, "").trim();
-              }
-
-              scheduleData[`${period}-${day}`] = {
-                subject: subject,
-                type: type,
-                teacher: teacher,
-                room: room,
-                groups: groups,
-                color: dayColors[day]
-              };
-            }
-            colIndex++;
-          }
-        }
-
-        renderTable();
-      } catch (e) {
-        console.log("Sheets API xatosi:", e);
-      }
-    }
-
     renderTable();
-    fetchSheetData();
 
     let currentFloor = 2;
     let selectedRoomKey = null;
