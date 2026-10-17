@@ -453,7 +453,6 @@
       padding: 10px;
     }
 
-    /* ANIQ MOSLASHUV: Xarita va Pin birga o'raldi */
     .map-wrapper {
       position: relative;
       display: inline-block;
@@ -468,7 +467,6 @@
       object-fit: contain;
     }
 
-    /* Pin / Marker on map */
     .map-pin {
       position: absolute;
       width: 20px;
@@ -587,6 +585,8 @@
   </div>
 
   <script>
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxAEveFB33E5_3gV80MJRH6s62ilw847vbH-vE1xIuaD-EGGD0eeAWBBEh9OxJcvCJe/exec";
+
     const periods = [
       { name: "1-para", time: "08:00 – 09:20" },
       { name: "2-para", time: "09:30 – 10:50" },
@@ -597,7 +597,8 @@
       { name: "7-para", time: "18:00 – 19:20" }
     ];
 
-    const data = {
+    // Zaxira ma'lumotlar (agar internet bo'lmasa yoki jadval yuklanmasa)
+    let scheduleData = {
       // Shanba (dayIndex: 5)
       "1-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
       "2-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
@@ -619,53 +620,69 @@
 
     const roomLocations = {
       "133-xona": { floor: 1, top: 58, left: 81.5, name: "133-xona (Auditoriya)" },
-      "227-xona": { floor: 2, top: 22, left: 55.0, name: "227-xona (Amaliyot)" },
+      "227-xona": { floor: 2, top: 22, left: 56.5, name: "227-xona (Amaliyot)" },
       "234-xona": { floor: 2, top: 43, left: 82.5, name: "234-xona (IoT Amaliyot)" },
       "236-xona": { floor: 2, top: 43, left: 88.5, name: "236-xona" },
       "238-xona": { floor: 2, top: 43, left: 94.0, name: "238-xona" },
       "323-xona": { floor: 3, top: 82, left: 59.2, name: "323-xona (Falsafa)" }
     };
 
-    const tbody = document.getElementById("schedule");
+    function renderTable() {
+      const tbody = document.getElementById("schedule");
+      tbody.innerHTML = "";
 
-    function renderLesson(lesson, time, key) {
-      return `
-        <div class="lesson ${lesson.color}" onclick='openMap("${lesson.room}", "${lesson.subject}")'>
-          <div class="lesson-time">${time}</div>
-          <div class="lesson-title">
-            ${lesson.subject}
-            ${lesson.type ? `<span class="lesson-type">(${lesson.type})</span>` : ""}
-          </div>
-          ${lesson.teacher ? `<div class="teacher">👤 ${lesson.teacher}</div>` : ""}
-          <div class="room">📍 ${lesson.room}</div>
-        </div>
-      `;
+      periods.forEach((period, p) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="time-cell">
+            <div class="period">${period.name}</div>
+            <div class="time">${period.time}</div>
+          </td>
+        `;
+
+        for (let day = 0; day < 7; day++) {
+          const cell = document.createElement("td");
+          const key = `${p}-${day}`;
+          const lesson = scheduleData[key];
+
+          if (lesson) {
+            cell.innerHTML = `
+              <div class="lesson ${lesson.color}" onclick='openMap("${lesson.room}", "${lesson.subject}")'>
+                <div class="lesson-time">${period.time}</div>
+                <div class="lesson-title">
+                  ${lesson.subject}
+                  ${lesson.type ? `<span class="lesson-type">(${lesson.type})</span>` : ""}
+                </div>
+                ${lesson.teacher ? `<div class="teacher">👤 ${lesson.teacher}</div>` : ""}
+                <div class="room">📍 ${lesson.room}</div>
+              </div>
+            `;
+          } else {
+            cell.innerHTML = `<div class="empty"><span>—</span></div>`;
+          }
+          row.appendChild(cell);
+        }
+        tbody.appendChild(row);
+      });
     }
 
-    periods.forEach((period, p) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td class="time-cell">
-          <div class="period">${period.name}</div>
-          <div class="time">${period.time}</div>
-        </td>
-      `;
-
-      for (let day = 0; day < 7; day++) {
-        const cell = document.createElement("td");
-        const key = `${p}-${day}`;
-        const lesson = data[key];
-
-        if (lesson) {
-          cell.innerHTML = renderLesson(lesson, period.time, key);
-        } else {
-          cell.innerHTML = `<div class="empty"><span>—</span></div>`;
-        }
-        row.appendChild(cell);
+    // Google Sheets'dan ma'lumotni yangilab olishga urinish
+    async function fetchSheetData() {
+      try {
+        const response = await fetch(SHEET_API_URL);
+        const rows = await response.json();
+        // Agar Google Sheet'dan ma'lumot muvaffaqiyatli kelsa, uni parse qilish mumkin
+        console.log("Google Sheets ma'lumotlari yuklandi:", rows);
+      } catch (e) {
+        console.log("Sheets API ulanishida xatolik, zaxira ma'lumot ishlatilmoqda:", e);
       }
-      tbody.appendChild(row);
-    });
+    }
 
+    // Dastlab jadvalni chizish va Sheets'ni tekshirish
+    renderTable();
+    fetchSheetData();
+
+    // MAP MODAL LOGIC
     let currentFloor = 2;
     let selectedRoomKey = null;
 
@@ -700,7 +717,7 @@
       } else if (floorNum === 2) {
         img.src = "2-qavat1.jpg";
       } else {
-        img.src, img.src = "3-qavat.jpg";
+        img.src = "3-qavat.jpg";
       }
 
       const activeRoom = targetRoom || roomLocations[selectedRoomKey];
