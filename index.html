@@ -585,7 +585,7 @@
   </div>
 
   <script>
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzSpGkWZwVgu20b9FH9QtEh4bD18XTENDW-l7-mkIGgA3PNMZ41nyXqh-nAnd_9N8NR/exec";
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxAEveFB33E5_3gV80MJRH6s62ilw847vbH-vE1xIuaD-EGGD0eeAWBBEh9OxJcvCJe/exec";
 
     const periods = [
       { name: "1-para", time: "08:00 – 09:20" },
@@ -598,19 +598,19 @@
     ];
 
     let scheduleData = {
-      // Zaxira ma'lumotlar
-      "5-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "238-xona", color: "green" },
-      "6-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "234-xona", color: "green" },
-      "1-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
-      "2-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
-      "3-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
-      "4-5": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", color: "orange" },
-      "5-5": { subject: "Risk Analysis and Systems Testing", type: "", teacher: "", room: "236-xona", color: "orange" },
-      "1-6": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "purple" },
-      "2-6": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", color: "purple" },
-      "3-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "323-xona", color: "purple" },
-      "4-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "238-xona", color: "purple" },
-      "5-6": { subject: "Digital Sustainability", type: "", teacher: "G‘ulomov Abdulaziz", room: "236-xona", color: "purple" }
+      // Zaxira (fallback) ma'lumotlar
+      "5-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "238-xona", groups: "24-310 (EN)", color: "green" },
+      "6-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "234-xona", groups: "24-310 (EN)", color: "green" },
+      "1-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
+      "2-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
+      "3-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "orange" },
+      "4-5": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", groups: "24-310 (EN)", color: "orange" },
+      "5-5": { subject: "Risk Analysis and Systems Testing", type: "", teacher: "", room: "236-xona", groups: "24-310 (EN)", color: "orange" },
+      "1-6": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", groups: "24-310 (EN)", color: "purple" },
+      "2-6": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", groups: "24-310 (EN)", color: "purple" },
+      "3-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "323-xona", groups: "24-310 (EN)", color: "purple" },
+      "4-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "238-xona", groups: "24-310 (EN)", color: "purple" },
+      "5-6": { subject: "Digital Sustainability", type: "", teacher: "G‘ulomov Abdulaziz", room: "236-xona", groups: "24-310 (EN)", color: "purple" }
     };
 
     const roomLocations = {
@@ -624,6 +624,7 @@
 
     function renderTable() {
       const tbody = document.getElementById("schedule");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
       periods.forEach((period, p) => {
@@ -650,6 +651,7 @@
                 </div>
                 ${lesson.teacher ? `<div class="teacher">👤 ${lesson.teacher}</div>` : ""}
                 <div class="room">📍 ${lesson.room}</div>
+                ${lesson.groups ? `<div class="teacher" style="font-size:7.5px; opacity:0.8;">👥 ${lesson.groups}</div>` : ""}
               </div>
             `;
           } else {
@@ -661,7 +663,6 @@
       });
     }
 
-    // Google Sheets ma'lumotlarini parse qilish
     async function fetchSheetData() {
       try {
         const response = await fetch(SHEET_API_URL);
@@ -669,7 +670,7 @@
 
         if (!rows || rows.length === 0) return;
 
-        // "24-310 (EN)" guruhiga tegishli qatorni topish
+        // "24-310" guruhining qatorini topamiz
         let myGroupRow = null;
         for (let i = 0; i < rows.length; i++) {
           if (rows[i][0] && rows[i][0].includes("24-310")) {
@@ -680,34 +681,60 @@
 
         if (!myGroupRow) return;
 
-        // Ma'lumotlarni mos ravishda ajratib olish
         const dayColors = ["green", "green", "green", "green", "green", "orange", "purple"];
-        
-        // Google Sheet'dagi har bir ustundan darslarni o'qish
-        // (1-ustun Dushanba 1-para, 2-ustun Dushanba 2-para va h.k.)
         let colIndex = 1;
+
         for (let day = 0; day < 7; day++) {
           for (let period = 0; period < 7; period++) {
             const cellText = myGroupRow[colIndex];
             if (cellText && cellText.trim() !== "") {
-              const lines = cellText.split("\n").map(l => l.trim()).filter(l => l);
+              // Qatorlarni bo'lib olamiz
+              const lines = cellText.split("\n").map(l => l.trim()).filter(l => l.length > 0);
               
-              const subject = lines[0] || "Dars";
-              const teacher = lines[1] || "";
-              const roomRaw = lines[2] || "";
-              
-              // Xona raqamini ajratish (masalan: "227 Room" -> "227-xona")
+              let subject = lines[0] || "Dars";
+              let teacher = "";
+              let roomRaw = "";
+              let groups = "";
+
+              // Katak tarkibini tahlil qilish
+              lines.forEach((line, idx) => {
+                if (idx === 0) {
+                  subject = line;
+                } else if (line.toLowerCase().includes("room") || line.toLowerCase().includes("lecture") || /\d{3}/.test(line)) {
+                  roomRaw = line;
+                } else if (line.includes("24-") || line.includes("EN") || line.includes("Group")) {
+                  groups = line;
+                } else {
+                  if (!teacher) teacher = line;
+                  else teacher += " " + line;
+                }
+              });
+
+              // Xona raqamini ajratish (Masalan: "238 Lecture Room" -> "238-xona")
               let room = roomRaw;
               const match = roomRaw.match(/\d+/);
               if (match) {
                 room = `${match[0]}-xona`;
+              } else if (!roomRaw) {
+                room = "Xona ko'rsatilmadi";
+              }
+
+              // Dars turini (Lecture/Practice) ajratish
+              let type = "";
+              if (subject.includes("(Practice)")) {
+                type = "Amaliyot";
+                subject = subject.replace("(Practice)", "").trim();
+              } else if (subject.includes("(Lecture)")) {
+                type = "Ma’ruza";
+                subject = subject.replace("(Lecture)", "").trim();
               }
 
               scheduleData[`${period}-${day}`] = {
                 subject: subject,
-                type: subject.includes("Practice") ? "Amaliyot" : (subject.includes("Lecture") ? "Ma'ruza" : ""),
+                type: type,
                 teacher: teacher,
                 room: room,
+                groups: groups,
                 color: dayColors[day]
               };
             }
@@ -715,17 +742,15 @@
           }
         }
 
-        // Qayta jadvalni chizish
         renderTable();
       } catch (e) {
-        console.log("Google Sheets yuklanishida xatolik:", e);
+        console.log("Sheets API xatosi:", e);
       }
     }
 
     renderTable();
     fetchSheetData();
 
-    // MAP MODAL LOGIC
     let currentFloor = 2;
     let selectedRoomKey = null;
 
@@ -740,8 +765,10 @@
       switchFloor(currentFloor, roomInfo);
     }
 
-    function closeModal() {
-      document.getElementById("mapModal").classList.remove("active");
+    function closeModal(e) {
+      if (!e || e.target.classList.contains("modal-overlay") || e.target.classList.contains("close-btn")) {
+        document.getElementById("mapModal").classList.remove("active");
+      }
     }
 
     function switchFloor(floorNum, targetRoom = null) {
