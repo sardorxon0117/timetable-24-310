@@ -1,591 +1,5 @@
-<!DOCTYPE html>
-<html lang="uz" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>24-310 (EN) — Dars jadvali va Kampus xaritasi</title>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-    :root {
-      --bg: #f4f6fb;
-      --surface: rgba(255, 255, 255, 0.7);
-      --shell-bg: rgba(255, 255, 255, 0.4);
-      --text: #172033;
-      --muted: #737d91;
-      --line: rgba(255, 255, 255, 0.9);
-      --header-bg: rgba(255, 255, 255, 0.85);
-      --lesson-bg: rgba(255, 255, 255, 0.75);
-      --lesson-border: rgba(255, 255, 255, 0.95);
-      --empty-bg: rgba(255, 255, 255, 0.35);
-      --empty-color: #a0a8b8;
-      --badge-bg: rgba(255, 255, 255, 0.7);
-      --badge-text: #59647a;
-      --card-shadow: 0 12px 40px rgba(44, 57, 91, 0.08);
-      --green: #178653;
-      --orange: #e87932;
-      --purple: #7954c8;
-      --modal-bg: rgba(255, 255, 255, 0.98);
-    }
-
-    [data-theme="dark"] {
-      --bg: #0b0f19;
-      --surface: rgba(30, 41, 59, 0.65);
-      --shell-bg: rgba(15, 23, 42, 0.6);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --line: rgba(255, 255, 255, 0.08);
-      --header-bg: rgba(30, 41, 59, 0.85);
-      --lesson-bg: rgba(30, 41, 59, 0.75);
-      --lesson-border: rgba(255, 255, 255, 0.1);
-      --empty-bg: rgba(255, 255, 255, 0.03);
-      --empty-color: #475569;
-      --badge-bg: rgba(30, 41, 59, 0.8);
-      --badge-text: #cbd5e1;
-      --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-      --green: #22c55e;
-      --orange: #fb923c;
-      --purple: #a855f7;
-      --modal-bg: rgba(15, 23, 42, 0.98);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-      font-family: 'Inter', sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      background-image: 
-        radial-gradient(ellipse at 10% 10%, var(--surface) 0, transparent 40%),
-        radial-gradient(ellipse at 90% 90%, var(--surface) 0, transparent 40%);
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    .page {
-      max-width: 1600px;
-      width: 100%;
-      height: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      flex-shrink: 0;
-    }
-
-    .eyebrow {
-      color: var(--green);
-      font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    h1 {
-      font-size: clamp(18px, 4vw, 28px);
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      line-height: 1.1;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .week-badge {
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: var(--badge-bg);
-      border: 1px solid var(--line);
-      backdrop-filter: blur(12px);
-      color: var(--badge-text);
-      font-size: 10px;
-      font-weight: 600;
-    }
-
-    .theme-toggle {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      background: var(--badge-bg);
-      border: 1px solid var(--line);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      transition: transform 0.2s;
-    }
-
-    .theme-toggle:active {
-      transform: scale(0.92);
-    }
-
-    /* Glass container */
-    .schedule-shell {
-      flex: 1;
-      padding: 6px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--shell-bg);
-      box-shadow: var(--card-shadow);
-      backdrop-filter: blur(20px);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .table-scroll {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: auto;
-      border-radius: 10px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      min-width: 900px;
-      border-collapse: separate;
-      border-spacing: 4px;
-      table-layout: fixed;
-    }
-
-    th, td {
-      border: 1px solid var(--line);
-      background: var(--surface);
-      backdrop-filter: blur(10px);
-      vertical-align: top;
-    }
-
-    th {
-      padding: 8px 4px;
-      text-align: center;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      border-radius: 6px;
-      background: var(--header-bg);
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    th:first-child {
-      width: 95px;
-      text-align: left;
-      padding-left: 8px;
-    }
-
-    th.thursday { color: var(--green); background: rgba(34, 197, 94, 0.12); }
-    th.saturday { color: var(--orange); background: rgba(251, 146, 60, 0.12); }
-    th.sunday { color: var(--purple); background: rgba(168, 85, 247, 0.12); }
-
-    td {
-      height: calc((100vh - 160px) / 7);
-      min-height: 70px;
-      padding: 4px;
-      border-radius: 6px;
-    }
-
-    /* Time column */
-    .time-cell {
-      height: auto;
-      vertical-align: middle;
-      text-align: left;
-      padding: 8px;
-      background: var(--header-bg);
-    }
-
-    .period {
-      font-size: 10px;
-      font-weight: 800;
-      margin-bottom: 2px;
-    }
-
-    .time {
-      color: var(--muted);
-      font-size: 9px;
-      white-space: nowrap;
-    }
-
-    /* Subject cards */
-    .lesson {
-      height: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
-      background: var(--lesson-bg);
-      border: 1px solid var(--lesson-border);
-      border-left: 3px solid var(--accent);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.15s, background 0.15s;
-    }
-
-    .lesson:active {
-      transform: scale(0.97);
-      background: var(--header-bg);
-    }
-
-    .lesson.green { --accent: var(--green); background: rgba(34, 197, 94, 0.08); }
-    .lesson.orange { --accent: var(--orange); background: rgba(251, 146, 60, 0.08); }
-    .lesson.purple { --accent: var(--purple); background: rgba(168, 85, 247, 0.08); }
-
-    .lesson-time {
-      color: var(--accent);
-      font-size: 8.5px;
-      font-weight: 800;
-      margin-bottom: 2px;
-      white-space: nowrap;
-    }
-
-    .lesson-title {
-      font-size: 10px;
-      line-height: 1.2;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .lesson-type {
-      font-weight: 500;
-      color: var(--muted);
-      font-size: 9px;
-    }
-
-    .teacher, .room {
-      color: var(--muted);
-      font-size: 8.5px;
-      line-height: 1.2;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .room {
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    /* Empty days */
-    .empty {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--empty-color);
-      font-size: 10px;
-    }
-
-    .empty span {
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: var(--empty-bg);
-    }
-
-    /* Footer */
-    .footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 6px;
-      padding: 0 2px;
-      flex-shrink: 0;
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .legend {
-      display: flex;
-      gap: 10px;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--dot);
-    }
-
-    /* MODAL MAP STYLES */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(8px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 12px;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: var(--modal-bg);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 900px;
-      max-height: 92vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      overflow: hidden;
-      animation: modalScale 0.2s ease-out;
-    }
-
-    @keyframes modalScale {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .modal-header {
-      padding: 12px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .modal-title {
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .close-btn {
-      background: var(--badge-bg);
-      border: 1px solid var(--line);
-      color: var(--text);
-      width: 30px; height: 30px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .modal-body {
-      padding: 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .floor-tabs {
-      display: flex;
-      gap: 6px;
-      background: var(--shell-bg);
-      padding: 3px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-    }
-
-    .floor-tab {
-      flex: 1;
-      padding: 8px 4px;
-      text-align: center;
-      border-radius: 6px;
-      border: none;
-      background: transparent;
-      color: var(--text);
-      font-weight: 700;
-      font-size: 11px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .floor-tab.active {
-      background: var(--green);
-      color: white;
-    }
-
-    .map-container {
-      position: relative;
-      width: 100%;
-      background: #0f172a;
-      border-radius: 10px;
-      overflow: auto;
-      border: 1px solid var(--line);
-      max-height: 52vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      -webkit-overflow-scrolling: touch;
-      padding: 10px;
-    }
-
-    .map-wrapper {
-      position: relative;
-      display: inline-block;
-      max-width: 100%;
-    }
-
-    .map-wrapper img {
-      display: block;
-      width: 100%;
-      max-width: 750px;
-      height: auto;
-      object-fit: contain;
-    }
-
-    .map-pin {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: #ef4444;
-      border: 2px solid #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 12px #ef4444, 0 0 24px #ef4444;
-      transform: translate(-50%, -50%);
-      display: none;
-      z-index: 10;
-      animation: pulsePin 1.5s infinite;
-    }
-
-    @keyframes pulsePin {
-      0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
-      100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    .map-info-banner {
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--green);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    @media (max-width: 600px) {
-      body { padding: 8px; }
-      .header { margin-bottom: 6px; }
-      .week-badge { display: none; }
-      .footer { flex-direction: column; gap: 4px; align-items: flex-start; }
-      .modal-card { max-height: 95vh; }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="page">
-
-    <header class="header">
-      <div>
-        <div class="eyebrow">PDP University · Software</div>
-        <h1>24-310 (EN) Dars Jadvali</h1>
-      </div>
-
-      <div class="header-right">
-        <div class="week-badge">2026 / 2027</div>
-        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Rejimni o'zgartirish">🌙</button>
-      </div>
-    </header>
-
-    <section class="schedule-shell">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>PARA / VAQT</th>
-              <th>DUSHANBA</th>
-              <th>SESHANBA</th>
-              <th>CHORSHANBA</th>
-              <th class="thursday">PAYSHANBA</th>
-              <th>JUMA</th>
-              <th class="saturday">SHANBA</th>
-              <th class="sunday">YAKSHANBA</th>
-            </tr>
-          </thead>
-          <tbody id="schedule"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <span>— Dars mavjud emas (Xonani ko'rish uchun darsni bosing)</span>
-      <div class="legend">
-        <div class="legend-item"><span class="dot" style="--dot: var(--green)"></span> Payshanba</div>
-        <div class="legend-item"><span class="dot" style="--dot: var(--orange)"></span> Shanba</div>
-        <div class="legend-item"><span class="dot" style="--dot: var(--purple)"></span> Yakshanba</div>
-      </div>
-    </footer>
-
-  </main>
-
-  <!-- MAP MODAL -->
-  <div class="modal-overlay" id="mapModal" onclick="closeModal(event)">
-    <div class="modal-card" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">📍 Xona xaritasi</div>
-        <button class="close-btn" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="map-info-banner" id="mapInfoBanner">
-          Xona tanlanmoqda...
-        </div>
-
-        <div class="floor-tabs">
-          <button class="floor-tab" id="tab1" onclick="switchFloor(1)">1-qavat</button>
-          <button class="floor-tab" id="tab2" onclick="switchFloor(2)">2-qavat</button>
-          <button class="floor-tab" id="tab3" onclick="switchFloor(3)">3-qavat</button>
-        </div>
-
-        <div class="map-container" id="mapContainer">
-          <div class="map-wrapper">
-            <img id="floorImage" src="" alt="Qavat xaritasi" />
-            <div class="map-pin" id="mapPin"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxAEveFB33E5_3gV80MJRH6s62ilw847vbH-vE1xIuaD-EGGD0eeAWBBEh9OxJcvCJe/exec";
+<script>
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbzSpGkWZwVgu20b9FH9QtEh4bD18XTENDW-l7-mkIGgA3PNMZ41nyXqh-nAnd_9N8NR/exec";
 
     const periods = [
       { name: "1-para", time: "08:00 – 09:20" },
@@ -597,25 +11,20 @@
       { name: "7-para", time: "18:00 – 19:20" }
     ];
 
-    // Zaxira ma'lumotlar (agar internet bo'lmasa yoki jadval yuklanmasa)
     let scheduleData = {
-      // Shanba (dayIndex: 5)
+      // Zaxira ma'lumotlar
+      "5-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "238-xona", color: "green" },
+      "6-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "234-xona", color: "green" },
       "1-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
       "2-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
       "3-5": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "orange" },
       "4-5": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", color: "orange" },
       "5-5": { subject: "Risk Analysis and Systems Testing", type: "", teacher: "", room: "236-xona", color: "orange" },
-
-      // Yakshanba (dayIndex: 6)
       "1-6": { subject: "Advanced Programming", type: "Amaliyot", teacher: "Islomboyev Botir", room: "227-xona", color: "purple" },
       "2-6": { subject: "Advanced Programming", type: "Ma’ruza", teacher: "Islomboyev Botir", room: "133-xona", color: "purple" },
       "3-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "323-xona", color: "purple" },
       "4-6": { subject: "Falsafa", type: "", teacher: "Baxranov Lazizjon", room: "238-xona", color: "purple" },
-      "5-6": { subject: "Digital Sustainability", type: "", teacher: "G‘ulomov Abdulaziz", room: "236-xona", color: "purple" },
-
-      // Payshanba (dayIndex: 3)
-      "5-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "238-xona", color: "green" },
-      "6-3": { subject: "Internet of Things", type: "Amaliyot", teacher: "Rezayei Sardareh", room: "234-xona", color: "green" }
+      "5-6": { subject: "Digital Sustainability", type: "", teacher: "G‘ulomov Abdulaziz", room: "236-xona", color: "purple" }
     };
 
     const roomLocations = {
@@ -666,19 +75,67 @@
       });
     }
 
-    // Google Sheets'dan ma'lumotni yangilab olishga urinish
+    // Google Sheets ma'lumotlarini parse qilish
     async function fetchSheetData() {
       try {
         const response = await fetch(SHEET_API_URL);
         const rows = await response.json();
-        // Agar Google Sheet'dan ma'lumot muvaffaqiyatli kelsa, uni parse qilish mumkin
-        console.log("Google Sheets ma'lumotlari yuklandi:", rows);
+
+        if (!rows || rows.length === 0) return;
+
+        // "24-310 (EN)" guruhiga tegishli qatorni topish
+        let myGroupRow = null;
+        for (let i = 0; i < rows.length; i++) {
+          if (rows[i][0] && rows[i][0].includes("24-310")) {
+            myGroupRow = rows[i];
+            break;
+          }
+        }
+
+        if (!myGroupRow) return;
+
+        // Ma'lumotlarni mos ravishda ajratib olish
+        const dayColors = ["green", "green", "green", "green", "green", "orange", "purple"];
+        
+        // Google Sheet'dagi har bir ustundan darslarni o'qish
+        // (1-ustun Dushanba 1-para, 2-ustun Dushanba 2-para va h.k.)
+        let colIndex = 1;
+        for (let day = 0; day < 7; day++) {
+          for (let period = 0; period < 7; period++) {
+            const cellText = myGroupRow[colIndex];
+            if (cellText && cellText.trim() !== "") {
+              const lines = cellText.split("\n").map(l => l.trim()).filter(l => l);
+              
+              const subject = lines[0] || "Dars";
+              const teacher = lines[1] || "";
+              const roomRaw = lines[2] || "";
+              
+              // Xona raqamini ajratish (masalan: "227 Room" -> "227-xona")
+              let room = roomRaw;
+              const match = roomRaw.match(/\d+/);
+              if (match) {
+                room = `${match[0]}-xona`;
+              }
+
+              scheduleData[`${period}-${day}`] = {
+                subject: subject,
+                type: subject.includes("Practice") ? "Amaliyot" : (subject.includes("Lecture") ? "Ma'ruza" : ""),
+                teacher: teacher,
+                room: room,
+                color: dayColors[day]
+              };
+            }
+            colIndex++;
+          }
+        }
+
+        // Qayta jadvalni chizish
+        renderTable();
       } catch (e) {
-        console.log("Sheets API ulanishida xatolik, zaxira ma'lumot ishlatilmoqda:", e);
+        console.log("Google Sheets yuklanishida xatolik:", e);
       }
     }
 
-    // Dastlab jadvalni chizish va Sheets'ni tekshirish
     renderTable();
     fetchSheetData();
 
@@ -746,5 +203,3 @@
       }
     }
   </script>
-</body>
-</html>
