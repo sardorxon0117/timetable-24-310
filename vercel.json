@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/sardorxon/admin", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/sardorxon/admin",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    }
+  ]
+}
