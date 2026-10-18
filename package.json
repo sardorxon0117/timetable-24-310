@@ -1,0 +1,12 @@
+{
+  "name": "dars-jadvali",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Haftalik dars jadvali sayti (Vercel + Neon)",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
